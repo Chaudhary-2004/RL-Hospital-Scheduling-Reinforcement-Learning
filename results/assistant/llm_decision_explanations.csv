@@ -1,0 +1,81 @@
+timestamp,state,action,reward,explanation
+2026-03-11 14:53:34.668751,[102.         200.           0.           0.27172834   0.        ],1,8,"
+Decision: ACCEPT
+
+Patient arrival time: 102.0 minutes
+Scheduled slot time: 200.0 minutes
+
+Priority level: 0.0
+No-show probability: 0.2720000147819519
+ICU utilization ratio: 0.0
+
+The RL agent evaluated expected reward and selected
+the action with the highest Q-value while balancing
+patient priority and ICU capacity.
+
+Observed reward from environment: 8
+"
+2026-03-11 15:02:34.176856,[120.  150.    1.    0.2   0.3],0,-1,"
+Decision: REJECT
+
+Patient arrival time: 120.0 minutes
+Scheduled slot time: 150.0 minutes
+
+Priority level: 1.0
+No-show probability: 0.20000000298023224
+ICU utilization ratio: 0.30000001192092896
+
+The RL agent evaluated expected reward and selected
+the action with the highest Q-value while balancing
+patient priority and ICU capacity.
+
+Observed reward from environment: -1
+"
+2026-03-11 15:04:18.347894,[102.         200.           0.           0.27172834   0.        ],1,8,"
+Decision: ACCEPT
+
+Patient arrival time: 102.0 minutes
+Scheduled slot time: 200.0 minutes
+
+Priority level: 0.0
+No-show probability: 0.2720000147819519
+ICU utilization ratio: 0.0
+
+The RL agent evaluated expected reward and selected
+the action with the highest Q-value while balancing
+patient priority and ICU capacity.
+
+Observed reward from environment: 8
+"
+2026-03-11 15:30:15.747403,[102.         200.           0.           0.27172834   0.        ],1,8,"
+Decision: ACCEPT
+
+Patient arrival time: 102.0 minutes
+Scheduled slot time: 200.0 minutes
+
+Priority level: 0.0
+No-show probability: 0.2720000147819519
+ICU utilization ratio: 0.0
+
+The RL agent evaluated expected reward and selected
+the action with the highest Q-value while balancing
+patient priority and ICU capacity.
+
+Observed reward from environment: 8
+"
+2026-03-11 15:30:24.453640,[4.3500000e+02 4.7900000e+02 0.0000000e+00 3.4119308e-01 2.0000000e-01],0,-1,"
+Decision: REJECT
+
+Patient arrival time: 435.0 minutes
+Scheduled slot time: 479.0 minutes
+
+Priority level: 0.0
+No-show probability: 0.3409999907016754
+ICU utilization ratio: 0.20000000298023224
+
+The RL agent evaluated expected reward and selected
+the action with the highest Q-value while balancing
+patient priority and ICU capacity.
+
+Observed reward from environment: -1
+"
