@@ -30,6 +30,13 @@ class HospitalEnv:
         self.current_index = 0
         self.current_icu_occupied = 0
         self.current_priority = None
+
+        # Metrics tracking
+        self.total_waiting_time = 0
+        self.patient_count = 0
+        self.busy_resource_time = 0
+        self.total_resource_time = 0
+
         return self._get_state()
 
     # ----------------------------------------------------
@@ -39,8 +46,8 @@ class HospitalEnv:
         row = self.data.iloc[self.current_index]
 
         return np.array([
-            row["arrival_time"],                   # raw time
-            row["slot_time"],                      # appointment slot
+            row["arrival_time"],
+            row["slot_time"],
             self.current_priority if self.current_priority is not None else row["priority"],
             row["no_show_prob"],
             self.current_icu_occupied / self.icu_capacity
@@ -52,12 +59,16 @@ class HospitalEnv:
     def step(self, action):
         row = self.data.iloc[self.current_index]
 
+        waiting_time = max(0, row["slot_time"] - row["arrival_time"])
+        self.total_waiting_time += waiting_time
+        self.patient_count += 1
+
         base_priority = row["priority"]
         show = row["show"]
 
-        # -------- Emergency Override (VISIBLE to agent) --------
+        # Emergency override
         if np.random.rand() < self.emergency_probability:
-            priority = 2  # critical emergency
+            priority = 2
         else:
             priority = base_priority
 
@@ -65,46 +76,61 @@ class HospitalEnv:
 
         reward = 0
 
-        # -------- ICU Discharge Simulation --------
-        # 20% chance one patient leaves ICU per step
+        # ICU discharge simulation
         if self.current_icu_occupied > 0:
             if np.random.rand() < 0.2:
                 self.current_icu_occupied -= 1
 
-        # -------- Decision Logic --------
+        # Decision logic
         if action == 1:  # ACCEPT
-
             if show == 0:
-                reward -= 5  # wasted slot
+                reward -= 5
             else:
                 if self.current_icu_occupied < self.icu_capacity:
                     self.current_icu_occupied += 1
                     if priority == 2:
-                        reward += 20  # saving critical case
+                        reward += 20
                     elif priority == 1:
                         reward += 12
                     else:
                         reward += 8
                 else:
-                    reward -= 20  # ICU full attempt
-
+                    reward -= 20
         else:  # REJECT
-
             if priority == 2:
-                reward -= 25  # rejecting emergency
+                reward -= 25
             elif priority == 1:
                 reward -= 6
             else:
                 reward -= 1
 
-        # -------- Doctor Break Constraint --------
+        # Doctor break constraint
         if row["slot_time"] in self.doctor_break_slots and action == 1:
             reward -= 5
 
-        # -------- Advance Time --------
+        # Resource utilization tracking
+        self.busy_resource_time += self.current_icu_occupied
+        self.total_resource_time += self.icu_capacity
+
+        # Advance time
         self.current_index += 1
         done = self.current_index >= self.num_patients
 
         next_state = None if done else self._get_state()
 
-        return next_state, reward, done
+        # Info dictionary for training logs
+        info = {
+            "waiting_time": waiting_time,
+            "icu_occupied": self.current_icu_occupied,
+            "resource_util": (self.current_icu_occupied / self.icu_capacity) * 100
+        }
+
+        return next_state, reward, done, info
+
+    # ----------------------------------------------------
+    # Metrics after episode
+    # ----------------------------------------------------
+    def get_metrics(self):
+        avg_wait = self.total_waiting_time / max(self.patient_count, 1)
+        utilization = (self.busy_resource_time / max(self.total_resource_time, 1)) * 100
+        return avg_wait, utilization

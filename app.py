@@ -59,7 +59,6 @@ if use_custom:
     st.session_state.state = custom_state
     st.session_state.done = False
 
-# IMPORTANT — read state AFTER custom override
 state = st.session_state.state
 
 # ============================================================
@@ -72,7 +71,6 @@ if state is not None:
 
     arrival, slot, priority, no_show, icu_ratio = state
 
-    # ---------------- LEFT COLUMN ----------------
     with col1:
         st.subheader("📋 Patient Information")
 
@@ -103,7 +101,6 @@ if state is not None:
         else:
             st.info("LOW priority patient")
 
-    # ---------------- RIGHT COLUMN ----------------
     with col2:
         st.subheader("📊 Feature Visualization")
 
@@ -137,26 +134,34 @@ with col3:
 
             action, explanation, q_values = assistant.decide(st.session_state.state)
 
-            # Assistant explanation
             st.success(explanation)
 
-            # Show Q-values graph
             q_df = pd.DataFrame({
                 "Action": ["Reject", "Accept"],
                 "Q-Value": q_values
             })
             st.bar_chart(q_df.set_index("Action"))
 
-            # Environment step
-            next_state, reward, done = st.session_state.env.step(action)
+            # ================= FIXED STEP FUNCTION =================
+            result = st.session_state.env.step(action)
 
-            # LLM explanation layer
+            # Handle BOTH old and new gym formats
+            if len(result) == 3:
+                next_state, reward, done = result
+            elif len(result) == 4:
+                next_state, reward, done, info = result
+            elif len(result) == 5:
+                next_state, reward, terminated, truncated, info = result
+                done = terminated or truncated
+            else:
+                raise ValueError("Unexpected number of return values from env.step()")
+            # ======================================================
+
             llm_explanation = explain_decision(st.session_state.state, action, reward)
 
             st.subheader("🧠 AI Decision Explanation")
             st.write(llm_explanation)
 
-            # Update session state
             st.session_state.total_reward += reward
             st.session_state.state = next_state
             st.session_state.done = done
@@ -203,3 +208,4 @@ with tab2:
         st.line_chart(losses_df["loss"])
     except:
         st.info("Loss CSV not found.")
+

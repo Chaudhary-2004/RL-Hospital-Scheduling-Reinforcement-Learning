@@ -79,3 +79,35 @@ patient priority and ICU capacity.
 
 Observed reward from environment: -1
 "
+2026-03-24 11:05:50.874914,[120.  150.    0.    0.2   0.3],1,8,"
+Decision: ACCEPT
+
+Patient arrival time: 120.0 minutes
+Scheduled slot time: 150.0 minutes
+
+Priority level: 0.0
+No-show probability: 0.20000000298023224
+ICU utilization ratio: 0.30000001192092896
+
+The RL agent evaluated expected reward and selected
+the action with the highest Q-value while balancing
+patient priority and ICU capacity.
+
+Observed reward from environment: 8
+"
+2026-03-29 14:45:44.805113,[102.         200.           0.           0.27172834   0.        ],1,8,"
+Decision: ACCEPT
+
+Patient arrival time: 102.0 minutes
+Scheduled slot time: 200.0 minutes
+
+Priority level: 0.0
+No-show probability: 0.2720000147819519
+ICU utilization ratio: 0.0
+
+The RL agent evaluated expected reward and selected
+the action with the highest Q-value while balancing
+patient priority and ICU capacity.
+
+Observed reward from environment: 8
+"
